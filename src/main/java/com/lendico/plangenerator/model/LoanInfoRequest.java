@@ -3,11 +3,15 @@ package com.lendico.plangenerator.model;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 public class LoanInfoRequest {
 
+	@Positive(message = "Loan Amount must be a positive number")
 	private BigDecimal loanAmount;
+	@Positive(message = "Normal Rate must be a positive number")
 	private BigDecimal nominalRate;
+	@Positive(message = "Duration must be a positive number")
 	private Integer duration;
 	private String startDate;
 

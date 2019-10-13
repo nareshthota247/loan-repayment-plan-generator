@@ -62,32 +62,82 @@ public class LoanRepaymentPlanGeneratorApplicationTests {
 	}
 
 	@Test
-	public void whenEmptyLoan_thenOneConstrainViolation() throws Exception {
+	public void whenNullLoan_thenOneConstrainViolation() throws Exception {
 		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
 				.content(mapper.writeValueAsBytes(new LoanInfoRequest("", "5.0", 24, "2018-01-01T01:00:01Z"))))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.loanAmount").value("Loan Amount may not be null")).andReturn();
 	}
+	
+	@Test
+	public void whenZeroLoan_thenOneConstrainViolation() throws Exception {
+		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
+				.content(mapper.writeValueAsBytes(new LoanInfoRequest("0", "5.0", 24, "2018-01-01T01:00:01Z"))))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.loanAmount").value("Loan Amount must be a positive number")).andReturn();
+	}
+	
+	@Test
+	public void whenNegitiveLoan_thenOneConstrainViolation() throws Exception {
+		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
+				.content(mapper.writeValueAsBytes(new LoanInfoRequest("-5000", "5.0", 24, "2018-01-01T01:00:01Z"))))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.loanAmount").value("Loan Amount must be a positive number")).andReturn();
+	}
 
 	@Test
-	public void whenNominalRate_thenOneConstrainViolation() throws Exception {
+	public void whenNullNominalRate_thenOneConstrainViolation() throws Exception {
 		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
 				.content(mapper.writeValueAsBytes(new LoanInfoRequest("5000", "", 24, "2018-01-01T01:00:01Z"))))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.nominalRate").value("Nominal Rate may not be null")).andReturn();
 	}
+	
+	@Test
+	public void whenZeroNominalRate_thenOneConstrainViolation() throws Exception {
+		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
+				.content(mapper.writeValueAsBytes(new LoanInfoRequest("5000", "0", 24, "2018-01-01T01:00:01Z"))))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.nominalRate").value("Normal Rate must be a positive number")).andReturn();
+	}
+	
+	@Test
+	public void whenNegitiveNominalRate_thenOneConstrainViolation() throws Exception {
+		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
+				.content(mapper.writeValueAsBytes(new LoanInfoRequest("5000", "-5", 24, "2018-01-01T01:00:01Z"))))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.nominalRate").value("Normal Rate must be a positive number")).andReturn();
+	}
 
 	@Test
-	public void whenDuration_thenOneConstrainViolation() throws Exception {
+	public void whenNullDuration_thenOneConstrainViolation() throws Exception {
 
 		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
 				.content(mapper.writeValueAsBytes(new LoanInfoRequest("5000", "5.0", "2018-01-01T01:00:01Z"))))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.duration").value("Duration may not be null"))
 				.andReturn();
 	}
+	
+	@Test
+	public void whenZeroDuration_thenOneConstrainViolation() throws Exception {
+
+		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
+				.content(mapper.writeValueAsBytes(new LoanInfoRequest("5000", "5.0", 0 ,"2018-01-01T01:00:01Z"))))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.duration").value("Duration must be a positive number"))
+				.andReturn();
+	}
+	
+	@Test
+	public void whenNegitiveDuration_thenOneConstrainViolation() throws Exception {
+
+		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
+				.content(mapper.writeValueAsBytes(new LoanInfoRequest("5000", "5.0", -24, "2018-01-01T01:00:01Z"))))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.duration").value("Duration must be a positive number"))
+				.andReturn();
+	}
 
 	@Test
-	public void whenStartDate_thenOneConstrainViolation() throws Exception {
+	public void whenNullStartDate_thenOneConstrainViolation() throws Exception {
 		mockMvc.perform(post("/api/generateRepaymentPlan").contentType(MediaType.APPLICATION_JSON)
 				.content(mapper.writeValueAsBytes(new LoanInfoRequest("5000", "5.0", 24, ""))))
 				.andExpect(status().isBadRequest())

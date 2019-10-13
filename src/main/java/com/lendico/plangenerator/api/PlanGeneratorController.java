@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,7 +35,7 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/api")
-@Api(value="Generate Loan Repayment Plan")
+@Api(value = "Generate Loan Repayment Plan")
 public class PlanGeneratorController {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlanGeneratorController.class);
@@ -77,5 +78,16 @@ public class PlanGeneratorController {
 			errors.put(fieldName, errorMessage);
 		});
 		return errors;
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorResponse> handleValidationExceptions(HttpMessageNotReadableException ex) {
+		logger.error("Exception HttpMessageNotReadableException :: {} ", ex.getMessage());
+		ErrorResponse error = new ErrorResponse();
+		error.setErrorCode(Integer.valueOf(1002));
+		error.setErrorDesc(ex.getMessage());
+		error.setTimestamp(new Date());
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
 }
